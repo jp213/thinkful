@@ -1,0 +1,95 @@
+Drills
+In the final checkpoint in this module, you'll complete a challenge.
+You'll use the ksprojects table from the kickstarterprojects database in the shared Thinkful server,
+and you'll write SQL queries for the following questions.
+
+To complete this challenge, you should submit a single text file that contains the SQL query required for each question.
+In some cases, you must also provide a specific answer.
+Plan to spend some time reviewing your answers with your mentor during your next session.
+
+1. Write a query that returns a list of all the unique values in the 'country' field.
+   SELECT DISTINCT country
+   FROM ksprojects;
+
+2. How many unique values are there for the main_category field? What about for the category field?
+   There are 15 unique values for the main_category field.  There are 158 unique values for the category field.
+   SELECT COUNT(DISTINCT main_category) AS main_cat_count, COUNT(DISTINCT category) AS cat_count
+   FROM ksprojects;
+
+3. Get a list of all the unique combinations of main_category and category fields, sorted A to Z by main_category.
+   SELECT DISTINCT main_category, category
+   FROM ksprojects
+   ORDER BY main_category;
+
+4. How many unique categories are in each main_category?
+   In the Art main_category, there are 13 unique categories.
+   In the Comics main_category, there are 6 unique categories.
+   In the Crafts main_category, there are 15 unique categories.
+   In the Dance main_category, there are 5 unique categories.
+   In the Design main_category, there are 7 unique categories.
+   In the Fashion main_category, there are 9 unique categories.
+   In the Film & Video main_category, there are 20 unique categories.
+   In the Food main_category, there are 13 unique categories.
+   In the Games main_category, there are 8 unique categories.
+   In the Journalism main_category, there are 6 unique categories.
+   In the Music main_category, there are 18 unique categories.
+   In the Photography main_category, there are 7 unique categories.
+   In the Publishing main_category, there are 15 unique categories.
+   In the Technology main_category, there are 16 unique categories.
+   In the Theater main_category, there are 7 unique categories.
+   SELECT main_category, COUNT(DISTINCT category)
+   FROM ksprojects
+   GROUP BY main_category;
+
+5. Write a query that returns the average number of backers per main_category,
+   rounded to the nearest whole number and sorted from high to low.
+   SELECT round(AVG(backers),0) AS avg_backers
+   FROM ksprojects
+   GROUP BY main_category
+   ORDER BY avg_backers;
+
+6. Write a query that shows, for each category, how many campaigns were successful
+   and the average difference per project between dollars pledged and the goal.
+   SELECT category, COUNT(state), round(AVG(CAST((pledged - goal) AS NUMERIC)), 2) AS exceeded_goal_by
+   FROM ksprojects
+   WHERE state = 'successful'
+   GROUP BY category
+   ORDER BY category;
+
+7. Write a query that shows, for each main category, how many projects had zero backers for that
+   category and the largest goal amount for that category (also for projects with zero backers).
+   SELECT main_category, COUNT(*), CAST(MAX(goal) AS NUMERIC) AS largest_goal_amt
+   FROM ksprojects
+   WHERE backers = 0
+   GROUP BY main_category;
+
+8. For each category, find the average USD per backer, and return only those results for
+   which the average USD per backer is < $50, sorted high to low. Hint: Division by NULL
+   is not possible, so use NULLIF to replace NULLs with 0 in the average calculation.
+   SELECT category, round(CAST(AVG((NULLIF(usd_pledged,0)) / NULLIF(backers, 0)) AS NUMERIC),2) AS avg_usd_per_backer
+   FROM ksprojects
+   GROUP BY category
+   HAVING round(CAST(AVG((NULLIF(usd_pledged,0)) / NULLIF(backers, 0)) AS NUMERIC),2) < 50
+   ORDER BY avg_usd_per_backer DESC;
+
+9. Write a query that shows, for each main_category, how many successful projects had between 5 and 10 backers.
+   SELECT main_category, COUNT(*) AS successful_projects
+   FROM ksprojects
+   WHERE state = 'successful' AND backers BETWEEN 5 AND 10
+   GROUP BY main_category;
+
+10. Get a total of the amount ‘pledged’ for each type of currency grouped by its respective currency.
+    Sort by ‘pledged’ from high to low.
+    SELECT currency, CAST(SUM(pledged) AS NUMERIC) AS total_per_currency
+    FROM ksprojects
+    GROUP BY currency
+    ORDER BY total_per_currency DESC;
+
+11. Excluding Games and Technology records in the main_category field, return the total of all backers for
+    successful projects by main_category where the total was more than 100,000. Sort by main_category from A to Z.
+    SELECT main_category, SUM(backers) AS total_backers
+    FROM ksprojects
+    WHERE main_category NOT IN('Games', 'Technology') AND state = 'successful'
+    GROUP BY main_category
+    HAVING SUM(backers) > 100000
+    ORDER BY main_category;
